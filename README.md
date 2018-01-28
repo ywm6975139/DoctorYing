@@ -1,7 +1,7 @@
 # DoctorYing
 Developing a visual software
 
-#软件开发需求
+## 软件开发需求
 1. 测序数据格式转换（fastq 转变为 fatsa），并进行基因片段拼接。
 已完成，确认中。
 
