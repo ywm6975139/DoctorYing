@@ -1,0 +1,59 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+*.tmp
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+ .mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+*.gz
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+.gitignore
+!/.gitignore
+
+# eclipse
+**/.project
+**/.classpath
+**/.settings/
+**/.matadata/
+**/RemoteSystemsTempFiles
+
+# maven
+**/target/
+**/overlays/
+
+# checkstyle
+**/.checkstyle
+
+# pmd
+**/.pmd
+
+# idea
+**/*.iml
+**/.idea/
+
+#ctags
+**/.tags*
+**/tags*
+
+#svn
+.svn
+
+#node
+node_modules
+
