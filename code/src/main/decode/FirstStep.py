@@ -3,7 +3,7 @@ import sys
 
 # import pandas as pd
 from Bio import SeqIO
-
+from  mothur_py import Mothur,MothurCommand
 reload(sys)
 sys.setdefaultencoding('utf8')
 
