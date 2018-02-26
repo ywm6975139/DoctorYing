@@ -1,69 +1,114 @@
 # _*_ coding:utf-8 _*_
-# 函数功能：输入两段长度为150的基因序列，进行首尾拼接，返回拼接结果。
-# 如果没有重复片段，返回 (0,None)
-# 如果重复片段小于30，返回 (1,'重复片段')
-# 如果重复片段大于等于30，返回 (2,'重复片段')
-def seqConcat(seq1, seq2):
+# 输入两段基因序列，进行首尾拼接，返回拼接结果。
+# 如果没有重复片段，返回 (0,'拼接结果')
+# 如果重复片段小于30，返回 (1,'拼接结果')
+# 如果重复片段大于等于30，返回 (2,'拼接结果')
+def seq_concat(seq1, seq2):
     if seq1 == seq2:
         return 2, seq1
     else:
-        seqCursor = 1
-        while seqCursor < 150:
-            if seq1[seqCursor:] == seq2[0:-seqCursor]:
-                if seqCursor <= 120:
-                    return 2, seq1[:seqCursor] + seq2
+        len1 = len(seq1)
+        len2 = len(seq2)
+        seq_cursor = 1
+        if len1 > len2:
+            if seq1[len1 - len2:] == seq2:
+                return 2, seq1
+            seq_cursor = len1 - len2 + 1
+        elif seq1 == seq2[:len1 - len2]:
+            return 2, seq2
+        while seq_cursor < len1:
+            if seq1[seq_cursor:] == seq2[0:len1 - seq_cursor]:
+                if len1 - seq_cursor >= 30:
+                    return 2, seq1[:seq_cursor] + seq2
                 else:
-                    return 1, seq1[:seqCursor] + seq2
+                    return 1, seq1[:seq_cursor] + seq2
             else:
-                seqCursor = seqCursor + 1
-        return 0, None
+                seq_cursor = seq_cursor + 1
+        return 0, seq1 + seq2
 
 
 # 测试两个完全相同的序列
 seq1 = 'CKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATA'
 seq2 = 'CKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATA'
-if seqConcat(seq1, seq2) == (2, seq1):
+if seq_concat(seq1, seq2) == (2, seq1):
     print 'pass'
 else:
     print 'error'
-    print seqConcat(seq1, seq2)[0]
-    print seqConcat(seq1, seq2)[1]
+    print seq_concat(seq1, seq2)[0]
+    print seq_concat(seq1, seq2)[1]
 # 测试重复片段大于30的两个序列
 seq1 = 'CKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATA'
 seq2 = 'CKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATAMKTESTDATA'
-if seqConcat(seq1, seq2) == (2,
+if seq_concat(seq1, seq2) == (2,
                              'CKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATAMKTESTDATA'):
     print 'pass'
 else:
     print 'error'
-    print seqConcat(seq1, seq2)[0]
-    print seqConcat(seq1, seq2)[1]
+    print seq_concat(seq1, seq2)[0]
+    print seq_concat(seq1, seq2)[1]
 # 测试重复片段小于30的两个序列
 seq1 = 'CKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATA'
 seq2 = 'CKTESTDATAMKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATA'
-if seqConcat(seq1, seq2) == (1,
+if seq_concat(seq1, seq2) == (1,
                              'CKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATAMKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATA'):
     print 'pass'
 else:
     print 'error'
-    print seqConcat(seq1, seq2)[0]
-    print seqConcat(seq1, seq2)[1]
+    print seq_concat(seq1, seq2)[0]
+    print seq_concat(seq1, seq2)[1]
 # 测试重复片段等于30的两个序列
 seq1 = 'CKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATA'
 seq2 = 'CKTESTDATACKTESTDATACKTESTDATAMKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATA'
-if seqConcat(seq1, seq2) == (2,
+if seq_concat(seq1, seq2) == (2,
                              'CKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATAMKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATA'):
     print 'pass'
 else:
     print 'error'
-    print seqConcat(seq1, seq2)[0]
-    print seqConcat(seq1, seq2)[1]
+    print seq_concat(seq1, seq2)[0]
+    print seq_concat(seq1, seq2)[1]
 # 测试没有重复片段的两个序列
 seq1 = 'CKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATA'
 seq2 = 'MKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATA'
-if seqConcat(seq1, seq2) == (0, None):
+if seq_concat(seq1, seq2) == (0, "CKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATAMKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATACKTESTDATA"):
     print 'pass'
 else:
     print 'error'
-    print seqConcat(seq1, seq2)[0]
-    print seqConcat(seq1, seq2)[1]
+    print seq_concat(seq1, seq2)[0]
+    print seq_concat(seq1, seq2)[1]
+
+seq1 = 'ABCDEFGH'
+seq2 = 'ABCDEFGH'
+if seq_concat(seq1, seq2) == (2, "ABCDEFGH"):
+    print 'pass'
+else:
+    print 'error'
+    print seq_concat(seq1, seq2)[0]
+    print seq_concat(seq1, seq2)[1]
+
+seq1 = 'ABCDEF'
+seq2 = 'ABCDEFGH'
+if seq_concat(seq1, seq2) == (2, "ABCDEFGH"):
+    print 'pass'
+else:
+    print 'error'
+    print seq_concat(seq1, seq2)[0]
+    print seq_concat(seq1, seq2)[1]
+
+
+seq1 = 'ABCDEFGH'
+seq2 = 'DEFGH'
+if seq_concat(seq1, seq2) == (2, "ABCDEFGH"):
+    print 'pass'
+else:
+    print 'error'
+    print seq_concat(seq1, seq2)[0]
+    print seq_concat(seq1, seq2)[1]
+
+seq1 = 'ABCDEF'
+seq2 = 'BCDEFGH'
+if seq_concat(seq1, seq2) == (1, "ABCDEFGH"):
+    print 'pass'
+else:
+    print 'error'
+    print seq_concat(seq1, seq2)[0]
+    print seq_concat(seq1, seq2)[1]
