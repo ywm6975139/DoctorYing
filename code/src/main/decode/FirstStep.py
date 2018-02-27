@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
-import threadpool
+import datetime
 import shutil
 
 # import pandas as pd
 from Bio import SeqIO
-from  mothur_py import Mothur,MothurCommand
+
 reload(sys)
 sys.setdefaultencoding('utf8')
 
 
 # 第一步：测序数据格式转换，并进行基因片段拼接。
-# 入参：两个fastq格式文件路径和输出文件夹路径
+# 入参：两个fastq格式文件路径、输出文件夹路径、输出路径不存在时退出还是创建文件夹
 def first_step(file_source_path_1, file_source_path_2, file_target_dir, mk_target_dir_if_not_exist=True):
     # 校验入参
     if not os.path.exists(file_target_dir):
@@ -45,18 +45,13 @@ def first_step(file_source_path_1, file_source_path_2, file_target_dir, mk_targe
     if not file_convert(file_source_path_2, file_target_path_2):
         return
 
-    # 将第一个fasta文件进行分割，每个文件不超过500,000条序列
+    # 将第一个fasta文件进行分割，每个文件不超过100,000条序列
     file_count = split_target_file(file_target_path_1, temp_dir)
     print "file_count:%s" % file_count
 
-    # 多线程处理序列拼接
-    task_pool = threadpool.ThreadPool(file_count)
-    thread_param_list = []  # 线程参数列表
+    # 处理序列拼接
     for index in range(1, file_count + 1):
-        thread_param_list.append(([index, temp_dir, file_target_path_2], None))
-    request_list = threadpool.makeRequests(seq_concat_thread, thread_param_list)  # 存放任务列表
-    [task_pool.putRequest(req) for req in request_list]  # 将每个任务放到线程池中，等待线程池中线程各自读取任务，然后进行处理
-    task_pool.wait()
+        seq_concat_deal(index, temp_dir, file_target_path_2)
 
     # 合并拼接结果文件，再分割用于上传到网站
     merge_split_result_file(temp_dir, file_count)
@@ -82,7 +77,7 @@ def file_convert(file_source_path, file_target_path):
         return False
 
 
-# 将第一个fasta文件进行分割，每个文件不超过500,000条序列，返回分割所得文件数
+# 将第一个fasta文件进行分割，每个文件不超过100,000条序列，返回分割所得文件数
 def split_target_file(file_target_path, temp_dir):
     print "split_target_file begin"
     count = 1
@@ -92,7 +87,7 @@ def split_target_file(file_target_path, temp_dir):
     for temp_seq in SeqIO.parse(file_target_path, "fasta"):
         file_list.append(temp_seq)
         current_size = current_size + 1
-        if current_size >= 50000:
+        if current_size >= 100000:
             print "create src split file,path:%s" % split_file_path
             SeqIO.write(file_list, split_file_path, "fasta")
             file_list = []
@@ -108,8 +103,8 @@ def split_target_file(file_target_path, temp_dir):
     return count
 
 
-# 基因拼接线程
-def seq_concat_thread(index, temp_dir, file_target_path):
+# 处理基因拼接
+def seq_concat_deal(index, temp_dir, file_target_path):
     print "seq_concat_thread begin, index:", index
     src_file_path = temp_dir + os.sep + str(index) + "_src.fasta"
     none_file_path = temp_dir + os.sep + str(index) + "_none.fasta"
@@ -140,7 +135,7 @@ def seq_concat_thread(index, temp_dir, file_target_path):
     if len(ge_seq_list) > 0:
         print "create ge_file, path:%s" % ge_file_path
         SeqIO.write(ge_seq_list, ge_file_path, "fasta")
-    print "seq_concat_thread end"
+    print "seq_concat_thread end, index:", index
 
 
 # 输入两段基因序列，进行首尾拼接，返回拼接结果。
@@ -211,7 +206,7 @@ def split_upload_file(file_path, file_target_dir, file_name_suffix):
     for temp_seq in SeqIO.parse(file_path, "fasta"):
         seq_list.append(temp_seq)
         current_size = current_size + 1
-        if current_size >= 50000:
+        if current_size >= 500000:
             print "create split upload file, path:%s" % result_file_path
             SeqIO.write(seq_list, result_file_path, "fasta")
             result_file_path_list.append(str(count) + file_name_suffix)
@@ -230,14 +225,18 @@ def split_upload_file(file_path, file_target_dir, file_name_suffix):
 
 
 if __name__ == '__main__':
-    file_source_path1 = "../File/test1.fastq"
-    file_target_path1 = "../File/test1.fasta"
-    file_source_path2 = "../File/test2.fastq"
-    file_target_path2 = "../File/test2.fasta"
-    # file_convert(file_source_path1,file_target_path1)
-    # file_convert(file_source_path2,file_target_path2)
-    for seq_record in SeqIO.parse(file_target_path1, "fasta"):
-        print str(seq_record.id)
-        print str(seq_record.seq)
-        print str(seq_record.seq.reverse_complement())
-        print len(seq_record)
+    start_time = datetime.datetime.now()
+    first_step("D:\\work\\DoctorYingTest\\test1.fastq", "D:\\work\\DoctorYingTest\\test2.fastq", "D:\\work\\DoctorYingTest\\result")
+    end_time = datetime.datetime.now()
+    print "cost time:%ds" % (end_time - start_time).seconds
+    # file_source_path1 = "../File/test1.fastq"
+    # file_target_path1 = "../File/test1.fasta"
+    # file_source_path2 = "../File/test2.fastq"
+    # file_target_path2 = "../File/test2.fasta"
+    # # file_convert(file_source_path1,file_target_path1)
+    # # file_convert(file_source_path2,file_target_path2)
+    # for seq_record in SeqIO.parse(file_target_path1, "fasta"):
+    #     print str(seq_record.id)
+    #     print str(seq_record.seq)
+    #     print str(seq_record.seq.reverse_complement())
+    #     print len(seq_record)
