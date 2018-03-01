@@ -47,7 +47,7 @@ def first_step(file_source_path_1, file_source_path_2, file_target_dir, mk_targe
     if not file_convert(file_source_path_2, file_target_path_2):
         return
 
-    # 将第一个fasta文件进行分割，每个文件不超过100,000条序列
+    # 将第一个fasta文件进行分割，每个文件不超过500,000条序列
     file_count = split_target_file(file_target_path_1, temp_dir)
 
     # 将第二个源文件做成key为id,value为seq的缓存
@@ -62,8 +62,8 @@ def first_step(file_source_path_1, file_source_path_2, file_target_dir, mk_targe
     lt_file_path_list = split_upload_file(temp_dir + os.sep + "lt.fasta", file_target_dir, "_lt.fasta")
     ge_file_path_list = split_upload_file(temp_dir + os.sep + "ge.fasta", file_target_dir, "_ge.fasta")
     return_dict = {'none': none_file_path_list, 'lt': lt_file_path_list, 'ge': ge_file_path_list}
-    shutil.rmtree(temp_dir)
     print "first_step end,cost time:%ds" % (datetime.datetime.now() - start_time).seconds
+    shutil.rmtree(temp_dir)
     return return_dict
 
 
@@ -82,7 +82,7 @@ def file_convert(file_source_path, file_target_path):
         return False
 
 
-# 将第一个fasta文件进行分割，每个文件不超过100,000条序列，返回分割所得文件数
+# 将第一个fasta文件进行分割，每个文件不超过500,000条序列，返回分割所得文件数
 def split_target_file(file_target_path, temp_dir):
     print "split_target_file begin"
     start_time = datetime.datetime.now()
@@ -93,7 +93,7 @@ def split_target_file(file_target_path, temp_dir):
     for temp_seq in SeqIO.parse(file_target_path, "fasta"):
         file_list.append(temp_seq)
         current_size = current_size + 1
-        if current_size >= 100000:
+        if current_size >= 500000:
             print "create src split file,path:%s" % split_file_path
             SeqIO.write(file_list, split_file_path, "fasta")
             file_list = []
@@ -123,7 +123,7 @@ def make_cache(file_path):
 
 # 处理基因拼接
 def seq_concat_deal(index, temp_dir, file_dict):
-    print "seq_concat_thread begin, index:", index
+    print "seq_concat_deal begin, index:", index
     start_time = datetime.datetime.now()
     src_file_path = temp_dir + os.sep + str(index) + "_src.fasta"
     none_file_path = temp_dir + os.sep + str(index) + "_none.fasta"
@@ -152,7 +152,7 @@ def seq_concat_deal(index, temp_dir, file_dict):
     if len(ge_seq_list) > 0:
         print "create ge_file, path:%s" % ge_file_path
         SeqIO.write(ge_seq_list, ge_file_path, "fasta")
-    print "seq_concat_thread end, index:%d, cost time:%ds" % (index, (datetime.datetime.now() - start_time).seconds)
+    print "seq_concat_deal end, index:%d, cost time:%ds" % (index, (datetime.datetime.now() - start_time).seconds)
 
 
 # 输入两段基因序列，进行首尾拼接，返回拼接结果。
@@ -160,27 +160,27 @@ def seq_concat_deal(index, temp_dir, file_dict):
 # 如果重复片段小于30，返回 (1,'拼接结果')
 # 如果重复片段大于等于30，返回 (2,'拼接结果')
 def seq_concat(seq1, seq2):
-    if seq1 == seq2:
-        return 2, seq1
-    else:
-        len1 = len(seq1)
-        len2 = len(seq2)
-        seq_cursor = 1
-        if len1 > len2:
-            if seq1[len1 - len2:] == seq2:
-                return 2, seq1
-            seq_cursor = len1 - len2 + 1
-        elif seq1 == seq2[:len1 - len2]:
-            return 2, seq2
-        while seq_cursor < len1:
-            if seq1[seq_cursor:] == seq2[0:-seq_cursor]:
-                if len1 - seq_cursor >= 30:
-                    return 2, seq1[:seq_cursor] + seq2
-                else:
-                    return 1, seq1[:seq_cursor] + seq2
-            else:
-                seq_cursor = seq_cursor + 1
-        return 0, seq1 + seq2
+    bytes1 = bytes(seq1)
+    bytes2 = bytes(seq2)
+    len1 = len(bytes1)
+    len2 = len(bytes2)
+    index = len1 - len2 if len1 > len2 else 0
+    while index < len1:
+        if bytes1[index] == bytes2[0]:
+            index2 = index + 1
+            match = True
+            while index2 < len1:
+                if bytes1[index2] != bytes2[index2 - index]:
+                    match = False
+                    break
+                index2 += 1
+            if match is True:
+                match_count = len1 - index
+                if match_count >= 30:
+                    return 2, seq1 + seq2[match_count:]
+                return 1, seq1 + seq2[match_count:]
+        index += 1
+    return 0, seq1 + seq2
 
 
 # 合并拼接结果文件
