@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
+import time
 import datetime
 import shutil
 
@@ -12,9 +13,10 @@ sys.setdefaultencoding('utf8')
 
 
 # 第一步：测序数据格式转换，并进行基因片段拼接。
-# 入参：两个fastq格式文件路径、输出文件夹路径、输出路径不存在时退出还是创建文件夹
 def first_step(file_source_path_1, file_source_path_2, file_target_dir, mk_target_dir_if_not_exist=True):
-    print "first_step begin"
+    print "first_step begin, current time:%s, file_source_path_1:%s, file_source_path_2:%s, file_target_dir:%s" % \
+          (time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), file_source_path_1, file_source_path_2,
+           file_target_dir)
     start_time = datetime.datetime.now()
     # 校验入参
     if not os.path.exists(file_target_dir):
@@ -29,42 +31,25 @@ def first_step(file_source_path_1, file_source_path_2, file_target_dir, mk_targe
     if not os.access(file_source_path_2, os.R_OK):
         print "file_source_path_2 is not exist or unable to read"
         return
-
     # 将fastq格式文件转为fasta格式
-    temp_dir = file_target_dir + os.sep + "temp"
+    temp_dir = file_target_dir + os.sep + ".temp0"
     if os.path.exists(temp_dir):
         shutil.rmtree(temp_dir)
     os.mkdir(temp_dir)
     file_target_path_1 = temp_dir + os.sep + os.path.basename(file_source_path_1)[:-1] + "a"
     file_target_path_2 = temp_dir + os.sep + os.path.basename(file_source_path_2)[:-1] + "a"
-    print "file_source_path_1:%s" % file_source_path_1
-    print "file_source_path_2:%s" % file_source_path_2
-    print "file_target_path_1:%s" % file_target_path_1
-    print "file_target_path_2:%s" % file_target_path_2
-    print "file_target_dir:%s" % file_target_dir
     if not file_convert(file_source_path_1, file_target_path_1):
         return
     if not file_convert(file_source_path_2, file_target_path_2):
         return
-
-    # 将第一个fasta文件进行分割，每个文件不超过500,000条序列
-    file_count = split_target_file(file_target_path_1, temp_dir)
-
-    # 将第二个源文件做成key为id,value为seq的缓存
-    file_dict = make_cache(file_target_path_2)
-    # 处理序列拼接
-    for index in range(1, file_count + 1):
-        seq_concat_deal(index, temp_dir, file_dict)
-    file_dict = None
-    # 合并拼接结果文件，再分割用于上传到网站
-    merge_split_result_file(temp_dir, file_count)
-    none_file_path_list = split_upload_file(temp_dir + os.sep + "none.fasta", file_target_dir, "_none.fasta")
-    lt_file_path_list = split_upload_file(temp_dir + os.sep + "lt.fasta", file_target_dir, "_lt.fasta")
-    ge_file_path_list = split_upload_file(temp_dir + os.sep + "ge.fasta", file_target_dir, "_ge.fasta")
-    return_dict = {'none': none_file_path_list, 'lt': lt_file_path_list, 'ge': ge_file_path_list}
+    # 处理序列拼接，生成拼接结果文件，每个文件的序列数不超过50w
+    file_path_list = seq_concat_deal(file_target_path_1, file_target_path_2, temp_dir)
+    # 合并拼接结果，每个文件的序列数不超过500w
+    result_dict = merge_concat_result(file_path_list, file_target_dir)
     print "first_step end,cost time:%ds" % (datetime.datetime.now() - start_time).seconds
+    # 删除临时文件
     shutil.rmtree(temp_dir)
-    return return_dict
+    return result_dict
 
 
 # 转换文件格式从fastq转换成fasta
@@ -82,83 +67,39 @@ def file_convert(file_source_path, file_target_path):
         return False
 
 
-# 将第一个fasta文件进行分割，每个文件不超过500,000条序列，返回分割所得文件数
-def split_target_file(file_target_path, temp_dir):
-    print "split_target_file begin"
+# 处理基因拼接，生成拼接结果文件，每个文件的序列数不超过50w
+def seq_concat_deal(file_target_path_1, file_target_path_2, temp_dir):
+    print "seq_concat_deal begin"
     start_time = datetime.datetime.now()
-    count = 1
-    current_size = 0
-    split_file_path = temp_dir + os.sep + str(count) + "_src.fasta"
-    file_list = []
-    for temp_seq in SeqIO.parse(file_target_path, "fasta"):
-        file_list.append(temp_seq)
-        current_size = current_size + 1
-        if current_size >= 500000:
-            print "create src split file,path:%s" % split_file_path
-            SeqIO.write(file_list, split_file_path, "fasta")
-            file_list = []
-            current_size = 0
-            count = count + 1
-            split_file_path = temp_dir + os.sep + str(count) + "_src.fasta"
-    if len(file_list) > 0:
-        print "create src split file,path:%s" % split_file_path
-        SeqIO.write(file_list, split_file_path, "fasta")
-    else:
-        count = count - 1
-    print "split_target_file end, result file count is:%d, cost time:%ds" % \
-          (count, (datetime.datetime.now() - start_time).seconds)
-    return count
-
-
-# 将文件做成key为id,value为seq的缓存
-def make_cache(file_path):
-    print "make_cache begin"
-    start_time = datetime.datetime.now()
-    file_dict = {}
-    for dict_seq in SeqIO.parse(file_path, "fasta"):
-        file_dict[dict_seq.id] = dict_seq.seq
-    print "make_cache end,cost time:%ds" % (datetime.datetime.now() - start_time).seconds
-    return file_dict
-
-
-# 处理基因拼接
-def seq_concat_deal(index, temp_dir, file_dict):
-    print "seq_concat_deal begin, index:", index
-    start_time = datetime.datetime.now()
-    src_file_path = temp_dir + os.sep + str(index) + "_src.fasta"
-    none_file_path = temp_dir + os.sep + str(index) + "_none.fasta"
-    lt_file_path = temp_dir + os.sep + str(index) + "_lt.fasta"
-    ge_file_path = temp_dir + os.sep + str(index) + "_ge.fasta"
-    none_seq_list = []
-    lt_seq_list = []
-    ge_seq_list = []
-    for temp_seq in SeqIO.parse(src_file_path, "fasta"):
+    seq_list = [[], [], []]
+    prefix_list = [1, 1, 1]
+    suffix_list = ["_none.fasta", "_lt.fasta", "_ge.fasta"]
+    file_dict = SeqIO.index(file_target_path_2, "fasta")
+    file_path_list = [[], [], []]
+    for temp_seq in SeqIO.parse(file_target_path_1, "fasta"):
         seq1 = temp_seq.seq
-        seq2 = file_dict[temp_seq.id].reverse_complement()
+        seq2 = file_dict[temp_seq.id].seq.reverse_complement()
         repeat_case, concat_result = seq_concat(seq1, seq2)
         temp_seq.seq = concat_result
-        if 0 == repeat_case:
-            none_seq_list.append(temp_seq)
-        elif 1 == repeat_case:
-            lt_seq_list.append(temp_seq)
-        else:
-            ge_seq_list.append(temp_seq)
-    if len(none_seq_list) > 0:
-        print "create none_file, path:%s" % none_file_path
-        SeqIO.write(none_seq_list, none_file_path, "fasta")
-    if len(lt_seq_list) > 0:
-        print "create lt_file, path:%s" % lt_file_path
-        SeqIO.write(lt_seq_list, lt_file_path, "fasta")
-    if len(ge_seq_list) > 0:
-        print "create ge_file, path:%s" % ge_file_path
-        SeqIO.write(ge_seq_list, ge_file_path, "fasta")
-    print "seq_concat_deal end, index:%d, cost time:%ds" % (index, (datetime.datetime.now() - start_time).seconds)
+        seq_list[repeat_case].append(temp_seq)
+        if len(seq_list[repeat_case]) >= 50000:
+            file_path = temp_dir + os.sep + str(prefix_list[repeat_case]) + suffix_list[repeat_case]
+            print "create split file, path:%s" % file_path
+            SeqIO.write(seq_list[repeat_case], file_path, "fasta")
+            file_path_list[repeat_case].append(file_path)
+            seq_list[repeat_case] = []
+            prefix_list[repeat_case] += 1
+    for index in range(2):
+        if len(seq_list[index]) > 0:
+            file_path = temp_dir + os.sep + str(prefix_list[index]) + suffix_list[index]
+            print "create split file, path:%s" % file_path
+            SeqIO.write(seq_list[index], file_path, "fasta")
+            file_path_list[index].append(file_path)
+    print "seq_concat_deal end, cost time:%ds" % (datetime.datetime.now() - start_time).seconds
+    return file_path_list
 
 
 # 输入两段基因序列，进行首尾拼接，返回拼接结果。
-# 如果没有重复片段，返回 (0,'拼接结果')
-# 如果重复片段小于30，返回 (1,'拼接结果')
-# 如果重复片段大于等于30，返回 (2,'拼接结果')
 def seq_concat(seq1, seq2):
     bytes1 = bytes(seq1)
     bytes2 = bytes(seq2)
@@ -183,76 +124,87 @@ def seq_concat(seq1, seq2):
     return 0, seq1 + seq2
 
 
-# 合并拼接结果文件
-def merge_split_result_file(temp_dir, file_count):
-    print "merge_split_result_file begin"
+# 合并拼接结果，每个文件的序列数不超过500w
+def merge_concat_result(file_path_list, file_target_dir):
+    print "merge_concat_result begin"
     start_time = datetime.datetime.now()
-    none_file = open(temp_dir + os.sep + "none.fasta", 'w')
-    lt_file = open(temp_dir + os.sep + "lt.fasta", 'w')
-    ge_file = open(temp_dir + os.sep + "ge.fasta", 'w')
-    for index in range(1, file_count + 1):
-        none_split_file_path = temp_dir + os.sep + str(index) + "_none.fasta"
-        lt_split_file_path = temp_dir + os.sep + str(index) + "_lt.fasta"
-        ge_split_file_path = temp_dir + os.sep + str(index) + "_ge.fasta"
-        if os.path.exists(none_split_file_path):
-            for line in open(none_split_file_path):
-                none_file.writelines(line)
-        if os.path.exists(lt_split_file_path):
-            for line in open(lt_split_file_path):
-                lt_file.writelines(line)
-        if os.path.exists(ge_split_file_path):
-            for line in open(ge_split_file_path):
-                ge_file.writelines(line)
-    none_file.close()
-    lt_file.close()
-    ge_file.close()
-    print "merge_split_result_file end,cost time:%ds" % (datetime.datetime.now() - start_time).seconds
+    suffix_list = ["_none.fasta", "_lt.fasta", "_ge.fasta"]
+    return_list = [[], [], []]
+    return_dict = {'none': return_list[0], 'lt': return_list[1], 'ge': return_list[2]}
+    for index in range(3):
+        path_list = file_path_list[index]
+        file_count = len(path_list)
+        if file_count == 0:
+            continue
+        prefix = 1
+        count = 0
+        file_name = str(prefix) + suffix_list[index]
+        file_path = file_target_dir + os.sep + file_name
+        print "create result file, path:%s" % file_path
+        result_file = open(file_path, 'w')
+        for split_file_path in path_list:
+            for line in open(split_file_path):
+                result_file.writelines(line)
+            count += 1
+            if count % 10 == 0 and count < file_count:
+                result_file.close()
+                return_list[index].append(file_name)
+                prefix += 1
+                file_name = str(prefix) + suffix_list[index]
+                file_path = file_target_dir + os.sep + file_name
+                print "create result file, path:%s" % file_path
+                result_file = open(file_path, 'w')
+        result_file.close()
+        return_list[index].append(file_name)
+    print "merge_concat_result end, cost time:%ds, return_dict:%s" % \
+          ((datetime.datetime.now() - start_time).seconds, return_dict)
+    return return_dict
 
 
-# 分割待上传到网站文件
-def split_upload_file(file_path, file_target_dir, file_name_suffix):
-    file_len = len(list(SeqIO.parse(file_path, "fasta")))
-    print "split_upload_file begin, file_path:%s, file_len:%d" % (file_path, file_len)
-    if 0 == file_len:
-        return
+# 构造测试数据
+def make_test_file(path1, path2, count=10000000):
     start_time = datetime.datetime.now()
-    count = 1
-    current_size = 0
-    result_file_path = file_target_dir + os.sep + str(count) + file_name_suffix
-    result_file_path_list = []
-    seq_list = []
-    for temp_seq in SeqIO.parse(file_path, "fasta"):
-        seq_list.append(temp_seq)
-        current_size = current_size + 1
-        if current_size >= 500000:
-            print "create split upload file, path:%s" % result_file_path
-            SeqIO.write(seq_list, result_file_path, "fasta")
-            result_file_path_list.append(str(count) + file_name_suffix)
-            seq_list = []
-            current_size = 0
-            count = count + 1
-            result_file_path = file_target_dir + os.sep + str(count) + file_name_suffix
-    if len(seq_list) > 0:
-        print "create split upload file, path:%s" % result_file_path
-        SeqIO.write(seq_list, result_file_path, "fasta")
-        result_file_path_list.append(str(count) + file_name_suffix)
-    else:
-        count = count - 1
-    print "split_upload_file end, result file count:%d, cost time:%ds" % \
-          (count, (datetime.datetime.now() - start_time).seconds)
-    return result_file_path_list
+    line3 = "+\n"
+    line4 = "#AAFFJJJJJJJJJJJ7JJJJJJJJ<JJ-AJJJJJJJJFF7FJFAJJJJJJJJJJFJJ7AF#<7AAJ<FFJJJJAJAJAAFAAF#<FJJJFF#7<F)-77JJ<7J7)<<AAJFJAF<<A<))7<F<77)A)7AFJJJ-7-----7))7)<\n"
+    seq11 = "NTGTCCCTCACCTGCGCTGTCTATGGTGGGTCCTTAAGTGGCTACTACTGGAGCTGGGTCCGGCAGCCCCCAGGGAAGGGACTGGAGTGGATTGGGTATATCTATTACAGTGGGAGCACCAACTACAACCCCTCCCTCAAGAGGCGAGTC\n"
+    seq12 = "NGTGACCGTGGTCCCTTGGCCCCAGACGTCCATACCGTAGTAGTGGTGGGACCAGCTGCTGNTATACCCTTTTCCCGCACAGTANTACACGGNCGTGTCCGCAGCGGTCACAGAGCTCAGCGTCAGGGAGAACTGGAACTTGGACGTGGC\n"
+    seq21 = "NGTGACCATTGTCCCTTGGCCCCACATATCAAAAGCATCATCGCCGATAACTCCCCCATAGGTAATCGGGCAGTGTGCACAATAATATGTGCCTGTGTCCTCAGGGTCCATGTTGGTCATTGTTATGACCACCTGGTTTTTGGAGGTGTC\n"
+    seq22 = "NTCACGCTGACCTGCACCTTCTCTGGCTTCTCACTNACCACTCATGGAGTGGGTGTGGGCTNGATCCGNCAGCCCCCAGGAAAGNCCCTGGANTGGCTTGCACNCATTTATTGGGNTAGTGATAAGCGCTACAGCCCATCTCTGAAGAAC\n"
+    seq31 = "NTGTCCCTCACCTGCACTGTCTCTGGTGACTCCATCAGTAGTTATTACTGGAGCTGGATCCGGCAGCCCCCAGGGAAGGGACTGGAGTGGATTGGGTATATCTATTACAGTGGGAGCACCAACTACAACCCCGCCCTCAAGAGTCGAGGT\n"
+    seq32 = "NGTGACCATTGTCCCTTGGCCCCAGATAAAAGGGGNGGTCAGCGTAGTTCGGCTCGCACAGNAATACANGGCCGTGTCCGCAGCNGTCACAGNGCTCAGCTTCNGGGAGATCTGGNTCTTGGACGTGTCTACGGATATCGTAACTCGACT\n"
+    seq41 = "NTCACGCTGACCTGCACCTTCTCTGGCTTCTCACTCACCACTCGTGGAGTGGGTGTGGGCTGGATCCGTCAGCCCCCAGGAAAGGCCCTGGAGTGGCTTGCACTCATTTATTGGAATGATGATAAGCGCTACAGCCCATCTCTGAAGAGC\n"
+    seq42 = "NGTGACCATTGTCCCTTGGCCCCAGACAAATTTCCNCCCACGTCTGTGTGCACAGTAATATNTGGCTGNGTCCACAGGGTCCATNTTGGTCANTGTAANGACCNCCTGGTTTTTGNAGGTGTCCTTGGTGATGGTGAGCCTGCTCTTCAG\n"
+    seq51 = "NTGTCCCTCACCTGCACTGTCTCTGGTGGCTCCATTAATAGTTACTATTGGATCTGGATCCGGCAGCCCCCAGGGAAGGGACTGGAGTGGATTGCGTATATCTATTACAGTGGGATCACCAACTACAACCCCGCCCTCAAGAGCCTAGTC\n"
+    seq52 = "NGTGACCGTGGTCCCTTGGCCCCAGATATCAAAAGCATCCCTTACGTAGTTCCAGTCCTTCCTCGCACAGTAATACACGGCCGTNTCCGCGGNGGTCACAGAGCTCAGCTTCAGGGAGAACTGGTTCTTGGACGTGGCGACTGAAATGAT\n"
+    list1 = [seq11, seq21, seq31, seq41, seq51]
+    list2 = [seq12, seq22, seq32, seq42, seq52]
+    file1 = open(path1, 'w')
+    file2 = open(path2, 'w')
+    range_count = count / 5
+    for index in range(range_count):
+        fill = str(index).zfill(7)
+        prefix = "@J00103:57:H53CJBBXX:5:11" + fill[0:2] + ":4" + fill[2:5] + ":1" + fill[5:]
+        id1 = prefix + "1 1:N:0:NGATGT\n"
+        id2 = prefix + "2 1:N:0:NGATGT\n"
+        id3 = prefix + "3 1:N:0:NGATGT\n"
+        id4 = prefix + "4 1:N:0:NGATGT\n"
+        id5 = prefix + "5 1:N:0:NGATGT\n"
+        ids = [id1, id2, id3, id4, id5]
+        for x in range(5):
+            file1.writelines(ids[x])
+            file1.writelines(list1[x])
+            file1.writelines(line3)
+            file1.writelines(line4)
+            file2.writelines(ids[x])
+            file2.writelines(list2[x])
+            file2.writelines(line3)
+            file2.writelines(line4)
+    file1.close()
+    file2.close()
+    print "make_test_file end,cost time:%ds" % (datetime.datetime.now() - start_time).seconds
 
 
 if __name__ == '__main__':
-    first_step("D:\\work\\DoctorYingTest\\10w1.fastq", "D:\\work\\DoctorYingTest\\10w2.fastq", "D:\\work\\DoctorYingTest\\result")
-    # file_source_path1 = "../File/test1.fastq"
-    # file_target_path1 = "../File/test1.fasta"
-    # file_source_path2 = "../File/test2.fastq"
-    # file_target_path2 = "../File/test2.fasta"
-    # # file_convert(file_source_path1,file_target_path1)
-    # # file_convert(file_source_path2,file_target_path2)
-    # for seq_record in SeqIO.parse(file_target_path1, "fasta"):
-    #     print str(seq_record.id)
-    #     print str(seq_record.seq)
-    #     print str(seq_record.seq.reverse_complement())
-    #     print len(seq_record)
+    # make_test_file("D:\\work\\DoctorYingTest\\1000w1.fastq", "D:\\work\\DoctorYingTest\\1000w2.fastq", 10000000)
+    first_step("D:\\work\\DoctorYingTest\\1w1.fastq", "D:\\work\\DoctorYingTest\\1w2.fastq",
+               "D:\\work\\DoctorYingTest\\result")
