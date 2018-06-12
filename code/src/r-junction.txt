@@ -1,0 +1,202 @@
+b <- read.csv ("i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-igg-junction-ana5.txt", header=F, sep=",")
+
+tab_c <- with(b,table(V4))
+write.table(tab_c,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_3vp-coun.csv", quote=F, sep=",")
+tab_c <- with(b,table(V5))
+write.table(tab_c,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_n1-coun.csv", quote=F, sep=",")
+ tab_d <- with(b,table(V6))
+ write.table(tab_d,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_5dp-coun.csv", quote=F, sep=",")
+ tab_f <- with(b,table(V7))
+  write.table(tab_f,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_3dp-coun.csv", quote=F, sep=",")
+ tab_g <- with(b,table(V8))
+  write.table(tab_g,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_n2-coun.csv", quote=F, sep=",")
+ tab_h <- with(b,table(V9))
+  write.table(tab_h,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_5jp-coun.csv", quote=F, sep=",")
+ tab_i <- with(b,table(V10))
+  write.table(tab_i,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_3vt-coun.csv", quote=F, sep=",")
+ tab_j <- with(b,table(V11))
+  write.table(tab_j,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_5dt-coun.csv", quote=F, sep=",")
+ tab_k <- with(b,table(V12))
+  write.table(tab_k,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_3dt-coun.csv", quote=F, sep=",")
+ tab_l <- with(b,table(V13))
+ write.table(tab_l,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_5jt-coun.csv", quote=F, sep=",")
+
+
+b$V4cat [b$V4 == 0] <- 0
+ b$V4cat [b$V4 > 0] <- 1
+
+b$V5cat [b$V5 == 0] <- 0
+ b$V5cat [b$V5 > 0] <- 1
+
+b$V6cat [b$V6 == 0] <- 0
+ b$V6cat [b$V6 > 0] <- 1
+ 
+b$V7cat [b$V7 == 0] <- 0
+ b$V7cat [b$V7 > 0] <- 1
+
+b$V8cat [b$V8 == 0] <- 0
+ b$V8cat [b$V8 > 0] <- 1
+
+b$V9cat [b$V9 == 0] <- 0
+ b$V9cat [b$V9 > 0] <- 1
+
+b$V10cat [b$V10 == 0] <- 0
+ b$V10cat [b$V10 > 0] <- 1
+
+b$V11cat [b$V11 == 0] <- 0
+ b$V11cat [b$V11 > 0] <- 1
+
+b$V12cat [b$V12 == 0] <- 0
+ b$V12cat [b$V12 > 0] <- 1
+
+b$V13cat [b$V13 == 0] <- 0
+ b$V13cat [b$V13 != 0] <- 1
+
+
+ tab_a <- with(b,table(V4cat))
+ tab_a1 <- prop.table(tab_a)*100
+ write.table(tab_a,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_3vpcat-coun.csv", quote=F, sep=",")
+ write.table(tab_a1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_3vpcat.csv", quote=F, sep=",")
+ tab_c <- with(b,table(V5cat))
+ tab_c1 <- prop.table(tab_c)*100
+ write.table(tab_c,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_n1cat-coun.csv", quote=F, sep=",")
+ write.table(tab_c1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_n1cat.csv", quote=F, sep=",")
+ tab_d <- with(b,table(V6cat))
+ tab_d1 <- prop.table(tab_d)*100
+ write.table(tab_d,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_5dpcat-coun.csv", quote=F, sep=",")
+ write.table(tab_d1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_5dpcat.csv", quote=F, sep=",")
+ tab_f <- with(b,table(V7cat))
+ tab_f1 <- prop.table(tab_f)*100
+ write.table(tab_f,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_3dpcat-coun.csv", quote=F, sep=",")
+ write.table(tab_f1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_3dpcat.csv", quote=F, sep=",")
+ tab_g <- with(b,table(V8cat))
+ tab_g1 <- prop.table(tab_g)*100
+ write.table(tab_g,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_n2cat-coun.csv", quote=F, sep=",")
+ write.table(tab_g1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_n2cat.csv", quote=F, sep=",")
+ tab_h <- with(b,table(V9cat))
+ tab_h1 <- prop.table(tab_h)*100
+ write.table(tab_h,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_5jpcat-coun.csv", quote=F, sep=",")
+ write.table(tab_h1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_5jpcat.csv", quote=F, sep=",")
+ tab_i <- with(b,table(V10cat))
+ tab_i1 <- prop.table(tab_i)*100
+ write.table(tab_i,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_3vtcar-coun.csv", quote=F, sep=",")
+ write.table(tab_i1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_3vtcar.csv", quote=F, sep=",")
+ tab_j <- with(b,table(V11cat))
+ tab_j1 <- prop.table(tab_j)*100
+write.table(tab_j,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_5dtcat-coun.csv", quote=F, sep=",")
+ write.table(tab_j1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_5dtcat.csv", quote=F, sep=",")
+ tab_k <- with(b,table(V12cat))
+ tab_k1 <- prop.table(tab_k)*100
+ write.table(tab_k,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_3dtcat-coun.csv", quote=F, sep=",")
+ write.table(tab_k1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_3dtcat.csv", quote=F, sep=",")
+ tab_l <- with(b,table(V13cat))
+ tab_l1 <- prop.table(tab_l)*100
+ write.table(tab_l,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_5jtcat-coun.csv", quote=F, sep=",")
+ write.table(tab_l1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_5jtcat.csv", quote=F, sep=",")
+
+mytab_p <- xtabs(~V1+V4cat,data=b)
+mytab_p1 <-  prop.table(mytab_p,1)*100
+write.table(mytab_p, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_v_3vpcat-coun.csv", quote=F, sep=",")
+write.table(mytab_p1, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_v_3vpcat.csv", quote=F, sep=",")
+
+mytab_o <- xtabs(~V1+V5cat,data=b)
+mytab_o1 <-  prop.table(mytab_o,1)*100
+write.table(mytab_o, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_v_n1cat-coun.csv", quote=F, sep=",")
+write.table(mytab_o1, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_v_n1cat.csv", quote=F, sep=",")
+
+mytab_q <- xtabs(~V2+V5cat,data=b)
+mytab_q1 <-  prop.table(mytab_q,1)*100
+write.table(mytab_q, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_d_n1cat-coun.csv", quote=F, sep=",")
+write.table(mytab_q1, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_d_n1cat.csv", quote=F, sep=",")
+
+mytab_s <- xtabs(~V2+V6cat,data=b)
+mytab_s1 <-  prop.table(mytab_s,1)*100
+write.table(mytab_s, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_d_5dpcat-coun.csv", quote=F, sep=",")
+write.table(mytab_s1, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_d_5dpcat.csv", quote=F, sep=",")
+
+mytab_t <- xtabs(~V2+V7cat,data=b)
+mytab_t1 <-  prop.table(mytab_t,1)*100
+write.table(mytab_t, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_d_3dpcat-coun.csv", quote=F, sep=",")
+write.table(mytab_t1, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_d_3dpcat.csv", quote=F, sep=",")
+
+mytab_u <- xtabs(~V2+V8cat,data=b)
+mytab_u1 <-  prop.table(mytab_u,1)*100
+write.table(mytab_u, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_d_n2cat-coun.csv", quote=F, sep=",")
+write.table(mytab_u1, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_d_n2cat.csv", quote=F, sep=",")
+
+mytab_v <- xtabs(~V3+V8cat,data=b)
+mytab_v1 <-  prop.table(mytab_v,1)*100
+write.table(mytab_v, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_j_n2cat-coun.csv", quote=F, sep=",")
+write.table(mytab_v1, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_j_n2cat.csv", quote=F, sep=",")
+
+mytab_w <- xtabs(~V3+V9cat,data=b)
+mytab_w1 <-  prop.table(mytab_w,1)*100
+write.table(mytab_w, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_j_5jpcat-coun.csv", quote=F, sep=",")
+write.table(mytab_w1, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_j_5jpcat.csv", quote=F, sep=",")
+
+mytab_x <- xtabs(~V1+V10cat,data=b)
+mytab_x1 <-  prop.table(mytab_x,1)*100
+write.table(mytab_x, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_v_3vtcat-coun.csv", quote=F, sep=",")
+write.table(mytab_x1, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_v_3vtcat.csv", quote=F, sep=",")
+
+mytab_y <- xtabs(~V2+V11cat,data=b)
+mytab_y1 <-  prop.table(mytab_y,1)*100
+write.table(mytab_y, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_d_5dtcat-coun.csv", quote=F, sep=",")
+write.table(mytab_y1, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_d_5dtcat.csv", quote=F, sep=",")
+
+mytab_z <- xtabs(~V2+V12cat,data=b)
+mytab_z1 <-  prop.table(mytab_z,1)*100
+write.table(mytab_z, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_d_3dtcat-coun.csv", quote=F, sep=",")
+write.table(mytab_z1, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_d_3dtcat.csv", quote=F, sep=",")
+
+mytab_a1 <- xtabs(~V3+V13cat,data=b)
+mytab_a2 <-  prop.table(mytab_a1,1)*100
+write.table(mytab_a1, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_j_5jtcat-coun.csv", quote=F, sep=",")
+write.table(mytab_a2, "i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/hiv-5-igg_j_5jtcat.csv", quote=F, sep=",")
+
+
+
+
+
+
+
+
+table1<- xtabs(~V4cat+V6cat,data=b)
+write.table(table1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/ng_02_3vp-n1-2.csv", quote=F, sep=",")
+
+table1<- xtabs(~V7cat+V6cat,data=b)
+write.table(table1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/ng_02_5dp-n1-2.csv", quote=F, sep=",")
+
+table1<- xtabs(~V8cat+V9cat,data=b)
+write.table(table1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/ng_02_3dp-n2-2.csv", quote=F, sep=",")
+
+table1<- xtabs(~V10cat+V9cat,data=b)
+write.table(table1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/ng_02_5jp-n2-2.csv", quote=F, sep=",")
+
+table1<- xtabs(~V11cat+V12cat,data=b)
+write.table(table1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/ng_02_3vt-5dt-2.csv", quote=F, sep=",")
+
+
+table1<- xtabs(~V4cat+V11cat,data=b)
+write.table(table1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/ng_02_3vp-3vt-2.csv", quote=F, sep=",")
+
+table1<- xtabs(~V6cat+V11cat,data=b)
+write.table(table1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/ng_02_n1-3vt-2.csv", quote=F, sep=",")
+
+table1<- xtabs(~V6cat+V12cat,data=b)
+write.table(table1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/ng_02_n1-5dt-2.csv", quote=F, sep=",")
+
+table1<- xtabs(~V7cat+V12cat,data=b)
+write.table(table1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/ng_02_5dp-5dt-2.csv", quote=F, sep=",")
+
+table1<- xtabs(~V8cat+V13cat,data=b)
+write.table(table1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/ng_02_3dp-3dt-2.csv", quote=F, sep=",")
+
+table1<- xtabs(~V9cat+V13cat,data=b)
+write.table(table1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/ng_02_n2-3dt-2.csv", quote=F, sep=",")
+
+table1<- xtabs(~V9cat+V14cat,data=b)
+write.table(table1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/ng_02_n2-5jt-2.csv", quote=F, sep=",")
+
+table1<- xtabs(~V10cat+V14cat,data=b)
+write.table(table1,"i:/hiv-5-igg-data/hiv-5-igg-sum/hiv-5-ana/ng_02_5jp-5jt-2.csv", quote=F, sep=",")

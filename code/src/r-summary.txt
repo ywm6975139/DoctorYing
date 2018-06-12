@@ -1,0 +1,71 @@
+b <- read.csv ("i:/HIV-IGM-SUM/hiv-5-igm/hiv-igm-summary-unique-ana5.txt", header=F, sep=",")
+ tab_a <- with(b,table(V1))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_v_geneallele.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_v_geneallele-prop.csv", quote=F, sep=",")
+
+ tab_a <- with(b,table(V2))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_d_geneallele.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_d_geneallele-prop.csv", quote=F, sep=",")
+
+ tab_a <- with(b,table(V3))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_j_geneallele.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_j_geneallele-prop.csv", quote=F, sep=",")
+
+ tab_a <- with(b,table(V4))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_v_genesub.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_v_genesub-prop.csv", quote=F, sep=",")
+
+tab_a <- with(b,table(V5))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_d_genesub.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_d_genesub-prop.csv", quote=F, sep=",")
+
+ tab_a <- with(b,table(V6))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_v_gene.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_v_gene-prop.csv", quote=F, sep=",")
+
+  tab_a <- with(b,table(V7))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_d_gene.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_d_gene-prop.csv", quote=F, sep=",")
+
+ tab_a <- with(b,table(V8))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_j_gene.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_j_gene-prop.csv", quote=F, sep=",")
+
+ tab_a <- with(b,table(V9))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_drf.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_v_drf-prop.csv", quote=F, sep=",")
+
+ tab_a <- with(b,table(V10))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_cdr1.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_cdr1-prop.csv", quote=F, sep=",")
+
+ tab_a <- with(b,table(V11))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_cdr2.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_cdr2-prop.csv", quote=F, sep=",")
+
+ tab_a <- with(b,table(V12))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_cdr3.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_cdr3-prop.csv", quote=F, sep=",")
+
+mytab_p <- xtabs(~V7+V12,data=b)
+mytab_p1 <-  prop.table(mytab_p,1)*100
+write.table(mytab_p, "i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_d_cdr3-count.csv", quote=F, sep=",")
+write.table(mytab_p1, "i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_d_cdr3.csv", quote=F, sep=",")
+
+mytab_p <- xtabs(~V8+V12,data=b)
+mytab_p1 <-  prop.table(mytab_p,1)*100
+write.table(mytab_p, "i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_j_cdr3-count.csv", quote=F, sep=",")
+write.table(mytab_p1, "i:/HIV-IGM-SUM/hiv-5-igm/hiv-5-igm_j_cdr3.csv", quote=F, sep=",")
+

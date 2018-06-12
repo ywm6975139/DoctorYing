@@ -1,0 +1,28 @@
+b <- read.csv ("i:/HIV-IGM-SUM/hiv-5-igm/hiv-igm-aachange-unique-70.txt", header=F, sep=",")
+
+tab_a <- with(b,table(V2))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-igm-700_FR1aa.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-igm-700_FR1aa-prop.csv", quote=F, sep=",")
+
+tab_a <- with(b,table(V3))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-igm-700_CDR1aa.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-igm-700_CDR1aa-prop.csv", quote=F, sep=",")
+
+tab_a <- with(b,table(V4))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-igm-700_FR2aa.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-igm-700_FR2aa-prop.csv", quote=F, sep=",")
+
+tab_a <- with(b,table(V5))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-igm-700_CDR2aa.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-igm-700_CDR2aa-prop.csv", quote=F, sep=",")
+
+tab_a <- with(b,table(V6))
+ tab_a1 <- prop.table(tab_a)*100
+write.table(tab_a,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-igm-700_FR3aa.csv", quote=F, sep=",")
+write.table(tab_a1,"i:/HIV-IGM-SUM/hiv-5-igm/hiv-igm-700_FR3aa-prop.csv", quote=F, sep=",")
+
+
